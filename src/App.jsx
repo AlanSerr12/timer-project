@@ -1,25 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Clock from './components/Clock';
+import Stopwatch from './components/Stopwatch';
+import Countdown from './components/Countdown';
+import Pomodoro from './components/Pomodoro';
+import './App.css';
+
+// lista de pestañas: cada una tiene un id, un nombre y el componente que muestra
+const TABS = [
+  { id: 'stopwatch', label: 'Cronómetro', Component: Stopwatch },
+  { id: 'countdown', label: 'Cuenta regresiva', Component: Countdown },
+  { id: 'pomodoro', label: 'Pomodoro', Component: Pomodoro },
+];
 
 function App() {
-          
-    // forma correcta de declarar variables de estado, para que se actualicen cada vez que se renderice el componente
-    const [hours, setHours] = useState(0);
-    const [minutes, setMinutes] = useState(0);
-    const [seconds, setSeconds] = useState(0); 
+  const [activeTab, setActiveTab] = useState('stopwatch');
 
-    // hook para actualizar el estado cada segundo
-    useEffect(() => {
-      const secondInterval = setInterval(() => {
-        setSeconds((prev) => prev + 1); // actualizamos el estado de seconds, sumando 1 cada segundo
-      }, 1000); // cada segundo se ejecuta la función que actualiza el estado
-
-      return () => clearInterval(secondInterval); // limpiamos el intervalo
-    }, []);
-    
   return (
-    <div>
-      <h1> Timer </h1>
-      <p> {hours} : {minutes} : {seconds} </p>  
+    <div className="app">
+      <Clock />
+
+      <nav className="tabs">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={tab.id === activeTab ? 'tab active' : 'tab'}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* renderizamos TODAS las pestañas y ocultamos las inactivas con "hidden"
+          así los componentes no se desmontan y conservan su estado (timers corriendo) */}
+      {TABS.map(({ id, Component }) => (
+        <div key={id} className="tab-content" hidden={id !== activeTab}>
+          <Component />
+        </div>
+      ))}
     </div>
   );
 }
